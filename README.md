@@ -1,94 +1,94 @@
 # AI Study Notes Frontend
 
-Сучасний клієнт-сайд додаток для управління навчальними матеріалами з курсор пагінацією.
+Modern client-side application for managing study materials with cursor pagination.
 
-## Особливості
+## Features
 
-- 🎨 **Сучасний дизайн** - Мінімалістичний інтерфейс з використанням Tailwind CSS
-- 📱 **Адаптивність** - Оптимізовано для всіх пристроїв
-- ⚡ **Курсор пагінація** - Ефективне завантаження великих списків
-- 🔄 **Автоматичне завантаження** - Підвантаження контенту при скролі
-- ➕ **Створення завдань** - Модальне вікно для додавання нових завдань
-- 🗑️ **Видалення завдань** - Безпечне видалення з підтвердженням
-- 📖 **Детальний перегляд** - Окрема сторінка з Markdown контентом
-- 🧭 **Маршрутизація** - Навігація між списком та деталями завдання
-- 🎯 **Статистика** - Відображення прогресу навчання
-- 🛡️ **Безпека** - API ключі в змінних середовища
+- 🎨 **Modern Design** - Minimalist interface using Tailwind CSS
+- 📱 **Responsive** - Optimized for all devices
+- ⚡ **Cursor Pagination** - Efficient loading of large lists
+- 🔄 **Auto Loading** - Content loading on scroll
+- ➕ **Task Creation** - Modal window for adding new tasks
+- 🗑️ **Task Deletion** - Safe deletion with confirmation
+- 📖 **Detailed View** - Separate page with Markdown content
+- 🧭 **Routing** - Navigation between list and task details
+- 🎯 **Statistics** - Learning progress display
+- 🛡️ **Security** - API keys in environment variables
 
-## Технології
+## Technologies
 
-- **React 18** - Основний фреймворк
-- **Vite** - Швидкий бандлер та dev сервер
-- **Tailwind CSS** - Utility-first CSS фреймворк
-- **Axios** - HTTP клієнт для API запитів
-- **React Router** - Маршрутизація між сторінками
-- **React Markdown** - Рендеринг Markdown контенту
+- **React 18** - Main framework
+- **Vite** - Fast bundler and dev server
+- **Tailwind CSS** - Utility-first CSS framework
+- **Axios** - HTTP client for API requests
+- **React Router** - Routing between pages
+- **React Markdown** - Markdown content rendering
 
-## Встановлення
+## Installation
 
-1. Клонуйте репозиторій:
+1. Clone the repository:
 ```bash
 git clone <repository-url>
 cd ai-studynotes-frontend
 ```
 
-2. Встановіть залежності:
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-3. Налаштуйте змінні середовища:
+3. Configure environment variables:
 ```bash
 cp env.example .env
 ```
 
-Відредагуйте `.env` файл:
+Edit the `.env` file:
 ```env
 VITE_API_BASE_URL=http://localhost:3000/api
 VITE_API_KEY=your-api-key-here
 ```
 
-4. Запустіть dev сервер:
+4. Start the dev server:
 ```bash
 npm run dev
 ```
 
-Додаток буде доступний за адресою `http://localhost:5173`
+The application will be available at `http://localhost:5173`
 
-## Структура проекту
+## Project Structure
 
 ```
 src/
-├── components/          # React компоненти
-│   ├── StudyItemCard.jsx       # Картка навчального матеріалу
-│   ├── StudyItemsList.jsx      # Список матеріалів з пагінацією
-│   ├── TaskDetailView.jsx      # Детальний перегляд завдання
-│   ├── CreateTaskModal.jsx     # Модальне вікно створення
-│   ├── DeleteConfirmModal.jsx  # Модальне вікно підтвердження видалення
-│   └── LoadingSpinner.jsx      # Індикатор завантаження
-├── pages/              # Сторінки додатку
-│   ├── TaskListPage.jsx        # Сторінка списку завдань
-│   └── TaskDetailPage.jsx      # Сторінка детального перегляду
-├── hooks/              # Кастомні React хуки
-│   ├── useStudyItems.js        # Хук для роботи з API списку
-│   └── useTaskDetail.js        # Хук для роботи з деталями завдання
-├── services/           # API сервіси
-│   └── api.js              # HTTP клієнт та API методи
-├── App.jsx             # Основний компонент з маршрутизацією
-├── main.jsx            # Точка входу
-└── index.css           # Глобальні стилі
+├── components/          # React components
+│   ├── StudyItemCard.jsx       # Study material card
+│   ├── StudyItemsList.jsx      # Materials list with pagination
+│   ├── TaskDetailView.jsx      # Task detail view
+│   ├── CreateTaskModal.jsx     # Creation modal window
+│   ├── DeleteConfirmModal.jsx  # Deletion confirmation modal
+│   └── LoadingSpinner.jsx      # Loading indicator
+├── pages/              # Application pages
+│   ├── TaskListPage.jsx        # Task list page
+│   └── TaskDetailPage.jsx      # Task detail page
+├── hooks/              # Custom React hooks
+│   ├── useStudyItems.js        # Hook for working with list API
+│   └── useTaskDetail.js        # Hook for working with task details
+├── services/           # API services
+│   └── api.js              # HTTP client and API methods
+├── App.jsx             # Main component with routing
+├── main.jsx            # Entry point
+└── index.css           # Global styles
 ```
 
 ## API
 
-Додаток працює з API, яке повертає дані у форматі:
+The application works with an API that returns data in the following format:
 
 ```json
 {
   "items": [
     {
       "id": "uuid",
-      "topic": "Назва теми",
+      "topic": "Topic Name",
       "status": "DONE|PROCESSING|QUEUED",
       "createdAt": "ISO date",
       "updatedAt": "ISO date"
@@ -98,9 +98,9 @@ src/
 }
 ```
 
-### Створення завдання
+### Task Creation
 
-Для створення нового завдання відправляється POST запит:
+To create a new task, a POST request is sent:
 
 ```json
 {
@@ -108,9 +108,9 @@ src/
 }
 ```
 
-### Детальний перегляд завдання
+### Task Detail View
 
-API повертає повну інформацію про завдання включаючи Markdown контент:
+The API returns complete task information including Markdown content:
 
 ```json
 {
@@ -119,58 +119,58 @@ API повертає повну інформацію про завдання в�
   "status": "DONE",
   "createdAt": "ISO date",
   "updatedAt": "ISO date",
-  "researchMd": "# Конспект на тему: Laravel\n\n## 1. Вступ до Laravel\n..."
+  "researchMd": "# Study Notes on Laravel\n\n## 1. Introduction to Laravel\n..."
 }
 ```
 
-### Ендпоінти
+### Endpoints
 
-- `GET /tasks?cursor=&limit=` - Отримання списку матеріалів
-- `GET /tasks/:id` - Отримання конкретного матеріалу
-- `POST /tasks` - Створення нового завдання
-- `DELETE /tasks/:id` - Видалення завдання
+- `GET /tasks?cursor=&limit=` - Get list of materials
+- `GET /tasks/:id` - Get specific material
+- `POST /tasks` - Create new task
+- `DELETE /tasks/:id` - Delete task
 
-### Заголовки
+### Headers
 
-Всі запити повинні містити заголовок:
+All requests must include the header:
 ```
 x-api-key: your-api-key
 ```
 
-## Скрипти
+## Scripts
 
-- `npm run dev` - Запуск dev сервера
-- `npm run build` - Збірка для продакшену
-- `npm run preview` - Попередній перегляд збірки
-- `npm run lint` - Перевірка коду ESLint
+- `npm run dev` - Start dev server
+- `npm run build` - Build for production
+- `npm run preview` - Preview build
+- `npm run lint` - ESLint code check
 
-## Налаштування
+## Configuration
 
 ### Tailwind CSS
 
-Кастомні кольори та стилі налаштовані в `tailwind.config.js`:
-- Primary кольори для брендингу
-- Кастомні компоненти в `index.css`
+Custom colors and styles are configured in `tailwind.config.js`:
+- Primary colors for branding
+- Custom components in `index.css`
 
-### Змінні середовища
+### Environment Variables
 
-- `VITE_API_BASE_URL` - Базовий URL API
-- `VITE_API_KEY` - API ключ для автентифікації
+- `VITE_API_BASE_URL` - Base API URL
+- `VITE_API_KEY` - API key for authentication
 
-## Розробка
+## Development
 
-### Додавання нових компонентів
+### Adding New Components
 
-1. Створіть файл в `src/components/`
-2. Експортуйте компонент за замовчуванням
-3. Імпортуйте та використовуйте в `App.jsx`
+1. Create a file in `src/components/`
+2. Export the component as default
+3. Import and use in `App.jsx`
 
-### Робота з API
+### Working with API
 
-1. Додайте нові методи в `src/services/api.js`
-2. Створіть хук в `src/hooks/` для управління станом
-3. Використовуйте хук в компонентах
+1. Add new methods in `src/services/api.js`
+2. Create a hook in `src/hooks/` for state management
+3. Use the hook in components
 
-## Ліцензія
+## License
 
 MIT License
