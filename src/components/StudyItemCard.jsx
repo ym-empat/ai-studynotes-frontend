@@ -1,7 +1,7 @@
 import React from 'react';
 import { StudyItemStatus } from '../services/api';
 
-const StudyItemCard = ({ item, onDelete }) => {
+const StudyItemCard = ({ item, onDelete, onTaskClick }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case StudyItemStatus.DONE:
@@ -38,10 +38,21 @@ const StudyItemCard = ({ item, onDelete }) => {
     });
   };
 
+  const handleCardClick = (e) => {
+    // Не переходимо до деталей, якщо клікнули на кнопку видалення
+    if (e.target.closest('button')) return;
+    if (onTaskClick) {
+      onTaskClick(item.id);
+    }
+  };
+
   return (
-    <div className="card hover:shadow-md transition-shadow duration-200">
+    <div 
+      className="card hover:shadow-md transition-shadow duration-200 cursor-pointer"
+      onClick={handleCardClick}
+    >
       <div className="flex items-start justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 flex-1">
+        <h3 className="text-lg font-semibold text-gray-900 flex-1 hover:text-primary-600 transition-colors">
           {item.topic}
         </h3>
         <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(item.status)}`}>
