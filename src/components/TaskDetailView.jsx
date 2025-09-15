@@ -249,6 +249,19 @@ const TaskDetailView = ({ task, loading, error, onBack }) => {
                   hr: () => (
                     <hr className="border-gray-200 my-8" />
                   ),
+                  a: ({ href, children }) => (
+                    <a 
+                      href={href} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-primary-600 underline decoration-2 underline-offset-2 hover:text-primary-700 hover:decoration-primary-700 transition-colors duration-200 font-medium inline-flex items-center gap-1"
+                    >
+                      {children}
+                      <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  ),
                   table: ({ children }) => (
                     <div className="overflow-x-auto mb-4">
                       <table className="min-w-full border border-gray-200 rounded-lg">

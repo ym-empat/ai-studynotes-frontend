@@ -98,3 +98,17 @@
 .prose td {
   @apply border border-gray-200 px-4 py-2 text-gray-700;
 }
+
+.prose a {
+  @apply text-primary-600 underline decoration-2 underline-offset-2 hover:text-primary-700 hover:decoration-primary-700 transition-colors duration-200 font-medium;
+}
+
+/* Додаткові стилі для лінків у списках */
+.prose li a {
+  @apply break-words;
+}
+
+/* Стилі для лінків у параграфах */
+.prose p a {
+  @apply break-words;
+}
