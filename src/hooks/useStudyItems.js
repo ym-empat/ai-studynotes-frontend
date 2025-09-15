@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchStudyItems } from '../services/api';
+import { fetchStudyItems, createStudyTask, deleteStudyTask } from '../services/api';
 
 export const useStudyItems = (initialLimit = 10) => {
   const [items, setItems] = useState([]);
@@ -45,6 +45,29 @@ export const useStudyItems = (initialLimit = 10) => {
     }
   }, [cursor, initialLimit, loadingMore, hasMore]);
 
+  // Створення нової завдання
+  const createTask = useCallback(async (topic) => {
+    try {
+      const newTask = await createStudyTask(topic);
+      // Додаємо нову завдання на початок списку
+      setItems(prevItems => [newTask, ...prevItems]);
+      return newTask;
+    } catch (error) {
+      throw error;
+    }
+  }, []);
+
+  // Видалення завдання
+  const removeTask = useCallback(async (id) => {
+    try {
+      await deleteStudyTask(id);
+      // Видаляємо завдання зі списку
+      setItems(prevItems => prevItems.filter(item => item.id !== id));
+    } catch (error) {
+      throw error;
+    }
+  }, []);
+
   // Оновлення даних
   const refresh = useCallback(() => {
     setItems([]);
@@ -66,5 +89,7 @@ export const useStudyItems = (initialLimit = 10) => {
     hasMore,
     loadMore,
     refresh,
+    createTask,
+    removeTask,
   };
 };

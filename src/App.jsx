@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useStudyItems } from './hooks/useStudyItems';
 import StudyItemsList from './components/StudyItemsList';
+import CreateTaskModal from './components/CreateTaskModal';
+import DeleteConfirmModal from './components/DeleteConfirmModal';
 
 function App() {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, taskId: null, taskTopic: '' });
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  
   const {
     items,
     loading,
@@ -11,7 +17,43 @@ function App() {
     hasMore,
     loadMore,
     refresh,
+    createTask,
+    removeTask,
   } = useStudyItems(10);
+
+  const handleCreateTask = async (topic) => {
+    await createTask(topic);
+  };
+
+  const handleDeleteClick = (taskId) => {
+    const task = items.find(item => item.id === taskId);
+    if (task) {
+      setDeleteModal({
+        isOpen: true,
+        taskId,
+        taskTopic: task.topic
+      });
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteModal.taskId) return;
+    
+    setDeleteLoading(true);
+    try {
+      await removeTask(deleteModal.taskId);
+      setDeleteModal({ isOpen: false, taskId: null, taskTopic: '' });
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      // Тут можна додати toast notification або інший спосіб показу помилки
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteModal({ isOpen: false, taskId: null, taskTopic: '' });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -28,6 +70,15 @@ function App() {
             </div>
             
             <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="btn-primary"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Створити завдання
+              </button>
               <button
                 onClick={refresh}
                 className="btn-secondary"
@@ -104,7 +155,7 @@ function App() {
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500">В процесі</p>
                   <p className="text-2xl font-semibold text-gray-900">
-                    {items.filter(item => item.status === 'IN_PROGRESS').length}
+                    {items.filter(item => item.status === 'PROCESSING').length}
                   </p>
                 </div>
               </div>
@@ -121,6 +172,7 @@ function App() {
           hasMore={hasMore}
           onLoadMore={loadMore}
           onRefresh={refresh}
+          onDelete={handleDeleteClick}
         />
       </main>
 
@@ -132,6 +184,22 @@ function App() {
           </div>
         </div>
       </footer>
+
+      {/* Create Task Modal */}
+      <CreateTaskModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreate={handleCreateTask}
+      />
+
+      {/* Delete Confirm Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        taskTopic={deleteModal.taskTopic}
+        loading={deleteLoading}
+      />
     </div>
   );
 }

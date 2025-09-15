@@ -9,7 +9,8 @@ const StudyItemsList = ({
   error, 
   hasMore, 
   onLoadMore, 
-  onRefresh 
+  onRefresh,
+  onDelete
 }) => {
   // Обробка скролу для автоматичного завантаження
   const handleScroll = useCallback(() => {
@@ -88,7 +89,7 @@ const StudyItemsList = ({
       {/* Список елементів */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => (
-          <StudyItemCard key={item.id} item={item} />
+          <StudyItemCard key={item.id} item={item} onDelete={onDelete} />
         ))}
       </div>
 

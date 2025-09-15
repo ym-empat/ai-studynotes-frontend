@@ -15,8 +15,8 @@ const apiClient = axios.create({
 // Типи даних
 export const StudyItemStatus = {
   DONE: 'DONE',
-  IN_PROGRESS: 'IN_PROGRESS',
-  TODO: 'TODO',
+  PROCESSING: 'PROCESSING',
+  QUEUED: 'QUEUED',
 };
 
 export const StudyItem = {
@@ -65,6 +65,35 @@ export const fetchStudyItem = async (id) => {
   } catch (error) {
     console.error('Error fetching study item:', error);
     throw new Error('Не вдалося завантажити деталі матеріалу.');
+  }
+};
+
+/**
+ * Створює нову навчальну завдання
+ * @param {string} topic - Тема завдання
+ * @returns {Promise<StudyItem>}
+ */
+export const createStudyTask = async (topic) => {
+  try {
+    const response = await apiClient.post('/tasks', { topic });
+    return response.data;
+  } catch (error) {
+    console.error('Error creating study task:', error);
+    throw new Error('Не вдалося створити завдання. Перевірте правильність даних.');
+  }
+};
+
+/**
+ * Видаляє навчальну завдання
+ * @param {string} id - ID завдання для видалення
+ * @returns {Promise<void>}
+ */
+export const deleteStudyTask = async (id) => {
+  try {
+    await apiClient.delete(`/tasks/${id}`);
+  } catch (error) {
+    console.error('Error deleting study task:', error);
+    throw new Error('Не вдалося видалити завдання. Перевірте підключення до API.');
   }
 };
 

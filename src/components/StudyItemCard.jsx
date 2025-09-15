@@ -1,14 +1,14 @@
 import React from 'react';
 import { StudyItemStatus } from '../services/api';
 
-const StudyItemCard = ({ item }) => {
+const StudyItemCard = ({ item, onDelete }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case StudyItemStatus.DONE:
         return 'bg-green-100 text-green-800 border-green-200';
-      case StudyItemStatus.IN_PROGRESS:
+      case StudyItemStatus.PROCESSING:
         return 'bg-blue-100 text-blue-800 border-blue-200';
-      case StudyItemStatus.TODO:
+      case StudyItemStatus.QUEUED:
         return 'bg-gray-100 text-gray-800 border-gray-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
@@ -19,9 +19,9 @@ const StudyItemCard = ({ item }) => {
     switch (status) {
       case StudyItemStatus.DONE:
         return 'Завершено';
-      case StudyItemStatus.IN_PROGRESS:
+      case StudyItemStatus.PROCESSING:
         return 'В процесі';
-      case StudyItemStatus.TODO:
+      case StudyItemStatus.QUEUED:
         return 'До виконання';
       default:
         return 'Невідомо';
@@ -68,11 +68,25 @@ const StudyItemCard = ({ item }) => {
       </div>
       
       <div className="mt-4 pt-4 border-t border-gray-100">
-        <div className="flex items-center text-xs text-gray-500">
-          <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-          </svg>
-          <span>ID: {item.id}</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center text-xs text-gray-500">
+            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            <span>ID: {item.id}</span>
+          </div>
+          
+          {onDelete && (
+            <button
+              onClick={() => onDelete(item.id)}
+              className="text-red-500 hover:text-red-700 transition-colors duration-200 p-1 rounded-md hover:bg-red-50"
+              title="Видалити завдання"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
     </div>
