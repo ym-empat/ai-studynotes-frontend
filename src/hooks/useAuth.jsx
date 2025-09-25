@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, createContext, useContext } from 'react';
 import { CognitoService } from '../services/cognitoService';
 import { setAuthHeaders } from '../services/api';
+import apiClient from '../services/api';
 
 // Створюємо контекст для автентифікації
 const AuthContext = createContext();
@@ -9,6 +10,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isApiReady, setIsApiReady] = useState(false);
   const [user, setUser] = useState(null);
   const [tokens, setTokens] = useState(null);
   const [error, setError] = useState(null);
@@ -107,9 +109,17 @@ export const AuthProvider = ({ children }) => {
     if (isAuthenticated && tokens?.idToken) {
       console.log('🔧 useAuth useEffect: Setting headers with token');
       setAuthHeaders(tokens.idToken.toString());
+      
+      // Встановлюємо стан готовності API через короткий час
+      setTimeout(() => {
+        const currentAuthHeader = apiClient.defaults.headers.common['Authorization'];
+        console.log('🔧 useAuth useEffect: Verification - Authorization header:', currentAuthHeader ? 'SET' : 'NOT SET');
+        setIsApiReady(!!currentAuthHeader);
+      }, 150);
     } else {
       console.log('🔧 useAuth useEffect: Clearing headers');
       setAuthHeaders(null);
+      setIsApiReady(false);
     }
   }, [isAuthenticated, tokens]);
 
@@ -370,6 +380,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     isAuthenticated,
     isLoading,
+    isApiReady,
     user,
     tokens,
     error,

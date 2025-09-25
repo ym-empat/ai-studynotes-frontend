@@ -16,6 +16,17 @@ export const useStudyItems = (initialLimit = 10) => {
     setLoading(true);
     setError(null);
     
+    // Перевіряємо, чи встановлені заголовки авторизації
+    const authHeader = auth.getIdToken();
+    if (!authHeader) {
+      console.log('⚠️ loadInitialData: No auth token available, skipping API call');
+      setError('Токен авторизації недоступний');
+      setLoading(false);
+      return;
+    }
+    
+    console.log('📊 loadInitialData: Auth token available, making API call');
+    
     try {
       const response = await fetchStudyItems(null, initialLimit);
       setItems(response.items || []);
@@ -26,7 +37,7 @@ export const useStudyItems = (initialLimit = 10) => {
     } finally {
       setLoading(false);
     }
-  }, [initialLimit]);
+  }, [initialLimit, auth]);
 
   // Завантаження додаткових даних (пагінація)
   const loadMore = useCallback(async () => {
@@ -96,17 +107,21 @@ export const useStudyItems = (initialLimit = 10) => {
     console.log('📊 useStudyItems effect:', {
       isAuthenticated: auth.isAuthenticated,
       isLoading: auth.isLoading,
+      isApiReady: auth.isApiReady,
       hasIdToken: !!auth.getIdToken()
     });
     
-    if (auth.isAuthenticated && !auth.isLoading) {
+    if (auth.isAuthenticated && !auth.isLoading && auth.isApiReady) {
+      console.log('📊 useStudyItems: API is ready, making call');
       loadInitialData();
     } else if (!auth.isLoading && !auth.isAuthenticated) {
       console.log('⚠️ User not authenticated, skipping API call');
       setItems([]);
       setError('Користувач не авторизований');
+    } else if (auth.isAuthenticated && !auth.isLoading && !auth.isApiReady) {
+      console.log('⏳ User authenticated but API not ready yet, waiting...');
     }
-  }, [loadInitialData, auth.isAuthenticated, auth.isLoading]);
+  }, [loadInitialData, auth.isAuthenticated, auth.isLoading, auth.isApiReady]);
 
   return {
     items,
