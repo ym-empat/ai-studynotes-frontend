@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './hooks/useAuth';
+import { useAuth } from './hooks/useAuth.jsx';
 import TaskListPage from './pages/TaskListPage';
 import TaskDetailPage from './pages/TaskDetailPage';
 import LoginPage from './pages/LoginPage';
@@ -46,7 +46,7 @@ const ProtectedRoute = ({ children }) => {
                 </div>
                 <div className="mt-4">
                   <button
-                    onClick={() => auth.signinRedirect()}
+                    onClick={() => window.location.reload()}
                     className="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-2 rounded text-sm font-medium"
                   >
                     Спробувати ще раз
@@ -96,7 +96,7 @@ const Layout = ({ children }) => {
               {auth.isAuthenticated && (
                 <div className="flex items-center space-x-3">
                   <div className="text-sm text-gray-700">
-                    Привіт, {auth.user?.profile?.email || 'Користувач'}!
+                    Привіт, {auth.getUserProfile()?.email || 'Користувач'}!
                   </div>
                   <button
                     onClick={handleSignOut}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -29,22 +29,18 @@ const LoginPage = () => {
     setError('');
 
     try {
-      // For Cognito with custom forms, we need to use redirect flow
-      // Store the form data in sessionStorage for after redirect
-      sessionStorage.setItem('cognito_login_data', JSON.stringify({
-        email: formData.email,
-        password: formData.password,
-        timestamp: Date.now()
-      }));
+      // Використовуємо auth хук для прямого логіну
+      const result = await auth.signIn(formData.email, formData.password);
       
-      // Use redirect flow to Cognito
-      await auth.signinRedirect({
-        login_hint: formData.email
-      });
-      
+      if (result.success) {
+        navigate('/');
+      } else {
+        setError(result.error);
+      }
     } catch (err) {
       console.error('Login error:', err);
-      setError('Помилка перенаправлення на сторінку входу. Спробуйте ще раз.');
+      setError('Помилка входу. Перевірте email та пароль.');
+    } finally {
       setLoading(false);
     }
   };
@@ -186,11 +182,21 @@ const LoginPage = () => {
 
             <div className="mt-6">
               <button
-                onClick={() => {
-                  sessionStorage.removeItem('cognito_login_data');
-                  auth.signinRedirect();
+                onClick={async () => {
+                  setLoading(true);
+                  setError('');
+                  try {
+                    // Тут можна додати Google OAuth через Cognito
+                    // Поки що показуємо повідомлення
+                    setError('Google OAuth буде додано пізніше');
+                  } catch (err) {
+                    setError('Помилка входу через Google');
+                  } finally {
+                    setLoading(false);
+                  }
                 }}
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                disabled={loading}
+                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
               >
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                   <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

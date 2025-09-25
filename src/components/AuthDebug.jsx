@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth.jsx';
 
 const AuthDebug = () => {
   const auth = useAuth();
@@ -20,13 +20,13 @@ const AuthDebug = () => {
         <div className="text-yellow-300">Using: ID Token</div>
         {auth.user && (
           <div className="mt-2">
-            <div>Email: {auth.user.profile?.email || 'N/A'}</div>
+            <div>Email: {auth.getUserProfile()?.email || 'N/A'}</div>
             <div>ID Token Preview: {auth.getIdToken()?.substring(0, 20)}...</div>
           </div>
         )}
         {auth.error && (
           <div className="text-red-300 mt-2">
-            Error: {auth.error.message}
+            Error: {auth.error}
           </div>
         )}
       </div>

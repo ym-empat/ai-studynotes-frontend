@@ -136,11 +136,25 @@ export class CognitoService {
       });
       
       console.log('✅ Cognito signIn success:', { isSignedIn, nextStep });
-      return {
-        success: true,
-        user: { username: email },
-        message: 'Вхід успішний!'
-      };
+      
+      if (isSignedIn) {
+        // Отримуємо поточного користувача та сесію
+        const currentUser = await getCurrentUser();
+        const session = await fetchAuthSession();
+        
+        return {
+          success: true,
+          user: currentUser,
+          session: session,
+          message: 'Вхід успішний!'
+        };
+      } else {
+        return {
+          success: false,
+          error: 'Потрібно підтвердження або додаткові кроки',
+          nextStep: nextStep
+        };
+      }
     } catch (error) {
       console.error('❌ Cognito signIn error:', error);
       return {
