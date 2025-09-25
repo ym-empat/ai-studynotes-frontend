@@ -1,13 +1,5 @@
 # Швидке налаштування Cognito для SPA
 
-## Проблема CSP
-Якщо ви бачите помилку:
-```
-Refused to frame 'https://eu-central-1liscrw4g3.auth.eu-central-1.amazoncognito.com/' because an ancestor violates the following Content Security Policy directive: "frame-ancestors 'none'"
-```
-
-Це означає, що Cognito блокує вбудовування в iframe. **Рішення**: Використовуйте redirect flow.
-
 ## Налаштування Cognito User Pool
 
 ### 1. App Client Settings
