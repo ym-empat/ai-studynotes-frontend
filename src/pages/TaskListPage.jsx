@@ -61,55 +61,39 @@ const TaskListPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <h1 className="text-xl font-bold text-gray-900">
-                  AI Study Notes
-                </h1>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="btn-primary"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Створити завдання
-              </button>
-              <button
-                onClick={refresh}
-                className="btn-secondary"
-                disabled={loading}
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Оновити
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Action Buttons */}
+      <div className="mb-8 flex justify-end space-x-4">
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="btn-primary"
+        >
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Створити завдання
+        </button>
+        <button
+          onClick={refresh}
+          className="btn-secondary"
+          disabled={loading}
+        >
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Оновити
+        </button>
+      </div>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Title */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Навчальні матеріали
-          </h2>
-          <p className="text-gray-600">
-            Переглядайте та керуйте своїми навчальними матеріалами
-          </p>
-        </div>
+      {/* Page Title */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Навчальні матеріали
+        </h2>
+        <p className="text-gray-600">
+          Переглядайте та керуйте своїми навчальними матеріалами
+        </p>
+      </div>
 
         {/* Stats */}
         {items.length > 0 && (
@@ -180,16 +164,7 @@ const TaskListPage = () => {
           onDelete={handleDeleteClick}
           onTaskClick={handleTaskClick}
         />
-      </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-500 text-sm">
-            <p>AI Study Notes - Система управління навчальними матеріалами</p>
-          </div>
-        </div>
-      </footer>
 
       {/* Create Task Modal */}
       <CreateTaskModal

@@ -12,6 +12,55 @@ const apiClient = axios.create({
   },
 });
 
+// Функція для оновлення заголовків авторизації
+export const setAuthHeaders = (accessToken) => {
+  if (accessToken) {
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+    console.log('✅ Authorization header set:', `Bearer ${accessToken.substring(0, 20)}...`);
+  } else {
+    delete apiClient.defaults.headers.common['Authorization'];
+    console.log('❌ Authorization header removed');
+  }
+};
+
+// Request interceptor для логування запитів
+apiClient.interceptors.request.use(
+  (config) => {
+    console.log('🚀 API Request:', {
+      method: config.method?.toUpperCase(),
+      url: config.url,
+      headers: {
+        'Authorization': config.headers.Authorization ? 'Bearer [TOKEN]' : 'None',
+        'x-api-key': config.headers['x-api-key'] ? '[SET]' : 'None'
+      }
+    });
+    return config;
+  },
+  (error) => {
+    console.error('❌ Request Error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor для логування відповідей
+apiClient.interceptors.response.use(
+  (response) => {
+    console.log('✅ API Response:', {
+      status: response.status,
+      url: response.config.url
+    });
+    return response;
+  },
+  (error) => {
+    console.error('❌ API Error:', {
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+      url: error.config?.url
+    });
+    return Promise.reject(error);
+  }
+);
+
 // Типи даних
 export const StudyItemStatus = {
   DONE: 'DONE',
