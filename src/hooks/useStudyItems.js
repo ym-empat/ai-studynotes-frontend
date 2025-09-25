@@ -96,7 +96,7 @@ export const useStudyItems = (initialLimit = 10) => {
     console.log('📊 useStudyItems effect:', {
       isAuthenticated: auth.isAuthenticated,
       isLoading: auth.isLoading,
-      hasAccessToken: !!auth.getAccessToken()
+      hasIdToken: !!auth.getIdToken()
     });
     
     if (auth.isAuthenticated && !auth.isLoading) {

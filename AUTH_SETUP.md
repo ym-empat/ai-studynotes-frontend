@@ -73,8 +73,8 @@ const MyComponent = () => {
   }
   
   // Отримання токенів
-  const accessToken = auth.getAccessToken();
-  const idToken = auth.getIdToken();
+  const accessToken = auth.getAccessToken(); // Доступний, але не використовується
+  const idToken = auth.getIdToken(); // Використовується для API запитів
   
   // Вихід
   const handleSignOut = () => {
@@ -85,18 +85,25 @@ const MyComponent = () => {
 
 ### Автоматичні заголовки API
 
-API клієнт автоматично додає Bearer токен до всіх запитів:
+API клієнт автоматично додає Bearer токен до всіх запитів. **Використовується ID токен**:
 
 ```javascript
 // В api.js
-export const setAuthHeaders = (accessToken) => {
-  if (accessToken) {
-    apiClient.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+export const setAuthHeaders = (idToken) => {
+  if (idToken) {
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${idToken}`;
   } else {
     delete apiClient.defaults.headers.common['Authorization'];
   }
 };
 ```
+
+### Різниця між Access та ID токенами
+
+- **Access Token** - використовується для доступу до API ресурсів
+- **ID Token** - містить інформацію про користувача, використовується для ідентифікації
+
+В цьому проекті використовується **ID Token** для авторизації API запитів.
 
 ### Захищені маршрути
 

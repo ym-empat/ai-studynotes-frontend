@@ -11,7 +11,7 @@
 Відкрийте Developer Tools (F12) і подивіться на логи:
 
 ```
-🔐 Auth state changed: { isAuthenticated: false, hasUser: false, hasAccessToken: false }
+🔐 Auth state changed: { isAuthenticated: false, hasUser: false, hasAccessToken: false, hasIdToken: false }
 ❌ Authorization header removed
 🚀 API Request: { method: 'GET', url: '/tasks', headers: { Authorization: 'None' } }
 ❌ API Error: { status: 401, message: 'Unauthorized', url: '/tasks' }
@@ -25,6 +25,8 @@
 - **Authenticated**: ❌ (якщо не авторизований)
 - **Has User**: ❌ (якщо немає користувача)
 - **Has Access Token**: ❌ (якщо немає токена)
+- **Has ID Token**: ❌ (якщо немає ID токена)
+- **Using: ID Token** (показує, що використовується ID токен)
 
 ### 3. Перевірте стан авторизації
 
@@ -39,8 +41,8 @@
 Після успішної авторизації в консолі повинно з'явитися:
 
 ```
-🔐 Auth state changed: { isAuthenticated: true, hasUser: true, hasAccessToken: true }
-✅ Authorization header set: Bearer eyJhbGciOiJSUzI1NiI...
+🔐 Auth state changed: { isAuthenticated: true, hasUser: true, hasAccessToken: true, hasIdToken: true }
+✅ Authorization header set (ID Token): Bearer eyJhbGciOiJSUzI1NiI...
 🚀 API Request: { method: 'GET', url: '/tasks', headers: { Authorization: 'Bearer [TOKEN]' } }
 ✅ API Response: { status: 200, url: '/tasks' }
 ```
@@ -58,21 +60,22 @@
 2. Увійдіть через Cognito
 3. Переконайтеся, що redirect URI правильний
 
-### Проблема 2: Немає токена
+### Проблема 2: Немає ID токена
 
 **Симптоми:**
-- `Authenticated: ✅` але `Has Access Token: ❌`
+- `Authenticated: ✅` але `Has ID Token: ❌`
 - В консолі: `❌ Authorization header removed`
 
 **Рішення:**
 1. Перевірте налаштування Cognito User Pool
-2. Переконайтеся, що scope включає необхідні дозволи
+2. Переконайтеся, що scope включає `openid`
 3. Перевірте, чи правильно налаштований OAuth 2.0 flow
+4. Переконайтеся, що response_type включає `id_token`
 
-### Проблема 3: Токен не передається
+### Проблема 3: ID токен не передається
 
 **Симптоми:**
-- `Has Access Token: ✅` але в API запиті `Authorization: 'None'`
+- `Has ID Token: ✅` але в API запиті `Authorization: 'None'`
 
 **Рішення:**
 1. Перевірте, чи правильно працює `setAuthHeaders`
@@ -94,18 +97,18 @@
 
 ### Успішна авторизація:
 ```
-🔐 Auth state changed: { isAuthenticated: true, hasUser: true, hasAccessToken: true }
-✅ Authorization header set: Bearer eyJhbGciOiJSUzI1NiI...
-📊 useStudyItems effect: { isAuthenticated: true, isLoading: false, hasAccessToken: true }
+🔐 Auth state changed: { isAuthenticated: true, hasUser: true, hasAccessToken: true, hasIdToken: true }
+✅ Authorization header set (ID Token): Bearer eyJhbGciOiJSUzI1NiI...
+📊 useStudyItems effect: { isAuthenticated: true, isLoading: false, hasIdToken: true }
 🚀 API Request: { method: 'GET', url: '/tasks', headers: { Authorization: 'Bearer [TOKEN]', x-api-key: '[SET]' } }
 ✅ API Response: { status: 200, url: '/tasks' }
 ```
 
 ### Неуспішна авторизація:
 ```
-🔐 Auth state changed: { isAuthenticated: false, hasUser: false, hasAccessToken: false }
+🔐 Auth state changed: { isAuthenticated: false, hasUser: false, hasAccessToken: false, hasIdToken: false }
 ❌ Authorization header removed
-📊 useStudyItems effect: { isAuthenticated: false, isLoading: false, hasAccessToken: false }
+📊 useStudyItems effect: { isAuthenticated: false, isLoading: false, hasIdToken: false }
 ⚠️ User not authenticated, skipping API call
 ```
 

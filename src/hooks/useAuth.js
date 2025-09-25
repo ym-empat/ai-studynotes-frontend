@@ -10,11 +10,12 @@ export const useAuth = () => {
     console.log('🔐 Auth state changed:', {
       isAuthenticated: auth.isAuthenticated,
       hasUser: !!auth.user,
-      hasAccessToken: !!auth.user?.access_token
+      hasAccessToken: !!auth.user?.access_token,
+      hasIdToken: !!auth.user?.id_token
     });
     
-    if (auth.isAuthenticated && auth.user && auth.user.access_token) {
-      setAuthHeaders(auth.user.access_token);
+    if (auth.isAuthenticated && auth.user && auth.user.id_token) {
+      setAuthHeaders(auth.user.id_token);
     } else {
       setAuthHeaders(null);
     }
@@ -46,7 +47,7 @@ export const useAuth = () => {
 
   // Create authorization headers for API requests
   const getAuthHeaders = useCallback(() => {
-    const token = getAccessToken();
+    const token = getIdToken();
     if (token) {
       return {
         'Authorization': `Bearer ${token}`,
@@ -56,7 +57,7 @@ export const useAuth = () => {
     return {
       'Content-Type': 'application/json'
     };
-  }, [getAccessToken]);
+  }, [getIdToken]);
 
   // Sign out and clear user data
   const signOut = useCallback(() => {

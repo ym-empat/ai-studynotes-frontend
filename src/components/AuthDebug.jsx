@@ -17,10 +17,11 @@ const AuthDebug = () => {
         <div>Has User: {auth.user ? '✅' : '❌'}</div>
         <div>Has Access Token: {auth.getAccessToken() ? '✅' : '❌'}</div>
         <div>Has ID Token: {auth.getIdToken() ? '✅' : '❌'}</div>
+        <div className="text-yellow-300">Using: ID Token</div>
         {auth.user && (
           <div className="mt-2">
             <div>Email: {auth.user.profile?.email || 'N/A'}</div>
-            <div>Token Preview: {auth.getAccessToken()?.substring(0, 20)}...</div>
+            <div>ID Token Preview: {auth.getIdToken()?.substring(0, 20)}...</div>
           </div>
         )}
         {auth.error && (

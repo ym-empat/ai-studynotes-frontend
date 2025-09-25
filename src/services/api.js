@@ -12,11 +12,11 @@ const apiClient = axios.create({
   },
 });
 
-// Функція для оновлення заголовків авторизації
-export const setAuthHeaders = (accessToken) => {
-  if (accessToken) {
-    apiClient.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-    console.log('✅ Authorization header set:', `Bearer ${accessToken.substring(0, 20)}...`);
+// Функція для оновлення заголовків авторизації (використовуємо ID токен)
+export const setAuthHeaders = (idToken) => {
+  if (idToken) {
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${idToken}`;
+    console.log('✅ Authorization header set (ID Token):', `Bearer ${idToken.substring(0, 20)}...`);
   } else {
     delete apiClient.defaults.headers.common['Authorization'];
     console.log('❌ Authorization header removed');
