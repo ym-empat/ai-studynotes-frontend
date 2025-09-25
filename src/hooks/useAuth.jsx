@@ -38,6 +38,7 @@ export const AuthProvider = ({ children }) => {
         setTokens(session.tokens);
         setIsAuthenticated(true);
         console.log('✅ User authenticated:', currentUser.username);
+        console.log('🔍 User attributes on load:', currentUser.attributes);
       } else {
         setIsAuthenticated(false);
         setUser(null);
@@ -120,14 +121,86 @@ export const AuthProvider = ({ children }) => {
   // Get user profile information
   const getUserProfile = useCallback(() => {
     if (user) {
+      console.log('🔍 User object:', user);
+      console.log('🔍 User attributes:', user.attributes);
+      console.log('🔍 User username:', user.username);
+      console.log('🔍 User userId:', user.userId);
+      
+      // Спробуємо отримати дані з ID токена
+      const idToken = tokens?.idToken;
+      if (idToken) {
+        try {
+          const payload = JSON.parse(atob(idToken.toString().split('.')[1]));
+          console.log('🔍 ID Token payload:', payload);
+          
+          // Використовуємо дані з токена як fallback
+          const tokenEmail = payload.email || payload['cognito:username'];
+          const tokenName = payload.name || payload.given_name || payload.family_name;
+          
+          console.log('🔍 Token email:', tokenEmail);
+          console.log('🔍 Token name:', tokenName);
+        } catch (error) {
+          console.log('🔍 Error parsing ID token:', error);
+        }
+      }
+      
+      // Спробуємо різні способи отримання імені
+      let name = user.attributes?.name || 
+                 user.attributes?.given_name || 
+                 user.attributes?.family_name;
+      
+      // Якщо ім'я не знайдено в атрибутах, спробуємо з ID токена
+      if (!name && idToken) {
+        try {
+          const payload = JSON.parse(atob(idToken.toString().split('.')[1]));
+          name = payload.name || payload.given_name || payload.family_name;
+          console.log('🔍 Name from ID token:', name);
+        } catch (error) {
+          console.log('🔍 Error parsing ID token for name:', error);
+        }
+      }
+      
+      // Якщо ім'я все ще не знайдено, використовуємо частину email
+      if (!name) {
+        const email = user.attributes?.email || user.username;
+        console.log('🔍 Email for name extraction:', email);
+        if (email && email.includes('@')) {
+          name = email.split('@')[0];
+          // Робимо першу літеру великою
+          name = name.charAt(0).toUpperCase() + name.slice(1);
+        } else {
+          name = 'Користувач';
+        }
+      }
+      
+      console.log('🔍 Extracted name:', name);
+      
+      // Спробуємо отримати email з різних джерел
+      let email = user.attributes?.email || user.username;
+      
+      // Якщо email не знайдено, спробуємо з ID токена
+      if (!email || email.includes('-') || email.length > 50) { // Перевіряємо, чи це не UUID
+        if (idToken) {
+          try {
+            const payload = JSON.parse(atob(idToken.toString().split('.')[1]));
+            email = payload.email || payload['cognito:username'];
+            console.log('🔍 Email from ID token:', email);
+          } catch (error) {
+            console.log('🔍 Error parsing ID token for email:', error);
+          }
+        }
+      }
+      
+      console.log('🔍 Final email:', email);
+      
       return {
-        email: user.username,
-        name: user.attributes?.name || user.username,
+        email: email,
+        name: name,
         sub: user.userId
       };
     }
     return null;
-  }, [user]);
+  }, [user, tokens]);
 
   // Create authorization headers for API requests
   const getAuthHeaders = useCallback(() => {

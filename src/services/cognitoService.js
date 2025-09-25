@@ -142,6 +142,9 @@ export class CognitoService {
         const currentUser = await getCurrentUser();
         const session = await fetchAuthSession();
         
+        console.log('🔍 Current user after signIn:', currentUser);
+        console.log('🔍 User attributes after signIn:', currentUser?.attributes);
+        
         return {
           success: true,
           user: currentUser,
@@ -195,6 +198,8 @@ export class CognitoService {
   static async getCurrentUser() {
     try {
       const user = await getCurrentUser();
+      console.log('🔍 CognitoService getCurrentUser result:', user);
+      console.log('🔍 User attributes in CognitoService:', user?.attributes);
       return user;
     } catch (error) {
       console.log('No authenticated user');

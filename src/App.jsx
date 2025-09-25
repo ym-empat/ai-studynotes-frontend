@@ -96,7 +96,7 @@ const Layout = ({ children }) => {
               {auth.isAuthenticated && (
                 <div className="flex items-center space-x-3">
                   <div className="text-sm text-gray-700">
-                    Привіт, {auth.getUserProfile()?.email || 'Користувач'}!
+                    Привіт, {auth.getUserProfile()?.name || 'Користувач'}!
                   </div>
                   <button
                     onClick={handleSignOut}

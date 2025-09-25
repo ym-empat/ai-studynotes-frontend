@@ -20,6 +20,7 @@ const AuthDebug = () => {
         <div className="text-yellow-300">Using: ID Token</div>
         {auth.user && (
           <div className="mt-2">
+            <div>Name: {auth.getUserProfile()?.name || 'N/A'}</div>
             <div>Email: {auth.getUserProfile()?.email || 'N/A'}</div>
             <div>ID Token Preview: {auth.getIdToken()?.substring(0, 20)}...</div>
           </div>
