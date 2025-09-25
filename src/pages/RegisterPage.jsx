@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { CognitoService } from '../services/cognitoService';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     confirmPassword: '',
-    firstName: '',
-    lastName: ''
+    name: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
+  const [confirmationCode, setConfirmationCode] = useState('');
   
   const auth = useAuth();
   const navigate = useNavigate();
@@ -28,6 +30,10 @@ const RegisterPage = () => {
   };
 
   const validateForm = () => {
+    if (!formData.email.includes('@')) {
+      setError('Введіть правильну email адресу');
+      return false;
+    }
     if (formData.password !== formData.confirmPassword) {
       setError('Паролі не співпадають');
       return false;
@@ -36,8 +42,8 @@ const RegisterPage = () => {
       setError('Пароль повинен містити принаймні 8 символів');
       return false;
     }
-    if (!formData.email.includes('@')) {
-      setError('Введіть правильну email адресу');
+    if (!formData.name.trim()) {
+      setError('Введіть ваше ім\'я');
       return false;
     }
     return true;
@@ -54,24 +60,78 @@ const RegisterPage = () => {
     setError('');
 
     try {
-      // For registration, we'll use the redirect flow to Cognito
-      // Store the form data in sessionStorage for after redirect
-      sessionStorage.setItem('cognito_register_data', JSON.stringify({
+      // Використовуємо Cognito сервіс для реєстрації
+      const result = await CognitoService.signUp({
         email: formData.email,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        timestamp: Date.now()
-      }));
-      
-      // Use redirect flow to Cognito for registration
-      await auth.signinRedirect({
-        login_hint: formData.email,
-        prompt: 'signup'
+        password: formData.password,
+        name: formData.name
       });
-      
+
+      if (result.success) {
+        if (result.needsConfirmation) {
+          setNeedsConfirmation(true);
+          setSuccess(true);
+        } else {
+          // Автоматично увійти після реєстрації
+          navigate('/');
+        }
+      } else {
+        setError(result.error);
+      }
     } catch (err) {
       console.error('Registration error:', err);
-      setError('Помилка перенаправлення на сторінку реєстрації. Спробуйте ще раз.');
+      setError('Помилка реєстрації. Спробуйте ще раз.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleConfirmCode = async (e) => {
+    e.preventDefault();
+    
+    if (!confirmationCode.trim()) {
+      setError('Введіть код підтвердження');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const result = await CognitoService.confirmSignUp(formData.email, confirmationCode);
+      
+      if (result.success) {
+        setSuccess(false);
+        setNeedsConfirmation(false);
+        navigate('/login');
+      } else {
+        setError(result.error);
+      }
+    } catch (err) {
+      console.error('Confirmation error:', err);
+      setError('Помилка підтвердження. Спробуйте ще раз.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const result = await CognitoService.resendConfirmationCode(formData.email);
+      
+      if (result.success) {
+        setError(''); // Очищаємо помилки
+        alert('Код відправлено повторно!');
+      } else {
+        setError(result.error);
+      }
+    } catch (err) {
+      console.error('Resend error:', err);
+      setError('Помилка відправки коду. Спробуйте ще раз.');
+    } finally {
       setLoading(false);
     }
   };
@@ -82,22 +142,79 @@ const RegisterPage = () => {
     return null;
   }
 
-  if (success) {
+  // Форма підтвердження email
+  if (needsConfirmation) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
             <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
+                <svg className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h3 className="mt-2 text-lg font-medium text-gray-900">Реєстрація успішна!</h3>
+              <h3 className="mt-2 text-lg font-medium text-gray-900">Підтвердіть email</h3>
               <p className="mt-2 text-sm text-gray-500">
-                Ваш акаунт було створено. Перенаправляємо на сторінку входу...
+                Ми відправили код підтвердження на <strong>{formData.email}</strong>
               </p>
             </div>
+
+            <form className="mt-8 space-y-6" onSubmit={handleConfirmCode}>
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-red-700">{error}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label htmlFor="confirmationCode" className="block text-sm font-medium text-gray-700">
+                  Код підтвердження
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="confirmationCode"
+                    name="confirmationCode"
+                    type="text"
+                    required
+                    value={confirmationCode}
+                    onChange={(e) => setConfirmationCode(e.target.value)}
+                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Введіть код з email"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Підтвердження...' : 'Підтвердити email'}
+                </button>
+              </div>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={handleResendCode}
+                  disabled={loading}
+                  className="text-sm text-blue-600 hover:text-blue-500 disabled:opacity-50"
+                >
+                  Відправити код повторно
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -144,43 +261,22 @@ const RegisterPage = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                  Ім'я
-                </label>
-                <div className="mt-1">
-                  <input
-                    id="firstName"
-                    name="firstName"
-                    type="text"
-                    autoComplete="given-name"
-                    required
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="Ваше ім'я"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                  Прізвище
-                </label>
-                <div className="mt-1">
-                  <input
-                    id="lastName"
-                    name="lastName"
-                    type="text"
-                    autoComplete="family-name"
-                    required
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="Ваше прізвище"
-                  />
-                </div>
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                Ім'я
+              </label>
+              <div className="mt-1">
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  placeholder="Ваше ім'я"
+                />
               </div>
             </div>
 
@@ -282,31 +378,6 @@ const RegisterPage = () => {
             </div>
           </form>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Або зареєструватися через</span>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <button
-                onClick={() => auth.signinRedirect()}
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-              >
-                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                  <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                Google
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

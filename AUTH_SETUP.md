@@ -123,10 +123,11 @@ export const setAuthHeaders = (idToken) => {
 - Автоматичне збереження даних форми в sessionStorage
 
 ### RegisterPage
-- Форма реєстрації з redirect flow
-- Валідація даних
-- Підтвердження умов використання
-- Автоматичне збереження даних форми в sessionStorage
+- Повна кастомна форма реєстрації на сайті
+- Пряма інтеграція з Cognito API через AWS Amplify
+- Поля: ім'я, email, пароль, підтвердження пароля
+- Автоматичне підтвердження email з кодом
+- Валідація форми на клієнті та сервері
 
 ### ProtectedRoute
 - Автоматичне перенаправлення неавторизованих користувачів
@@ -148,6 +149,27 @@ const MyComponent = () => {
     return response.data;
   };
 };
+```
+
+## CognitoService
+
+Сервіс для прямої роботи з Cognito API:
+
+```javascript
+import { CognitoService } from '../services/cognitoService';
+
+// Реєстрація
+const result = await CognitoService.signUp({
+  email: 'user@example.com',
+  password: 'password123',
+  name: 'John Doe'
+});
+
+// Підтвердження email
+const result = await CognitoService.confirmSignUp(email, code);
+
+// Повторна відправка коду
+const result = await CognitoService.resendConfirmationCode(email);
 ```
 
 ## Налаштування Cognito User Pool
